@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solicitar Exclusão de Dados — Seleção IA</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2310203a'/%3E%3Crect x='7' y='6' width='18' height='14' rx='2' fill='%23ffffff'/%3E%3Crect x='14.5' y='20' width='3' height='7' fill='%23c9a13b'/%3E%3Cpath d='M11 15.5l3-6h1.6l-3 6zM17 9.5h4.2v1.4h-2.6l-.2 1.3c1.9-.2 3 .6 3 1.9 0 1.4-1.1 2.3-2.8 2.3-.8 0-1.5-.2-2-.5l.4-1.2c.4.2.9.4 1.5.4.8 0 1.3-.4 1.3-1 0-.8-.9-1.2-2.9-1z' fill='%2310203a'/%3E%3C/svg%3E">
+  <style>
+    .success-message { display: none; color: var(--good); font-size: 14px; margin-top: 12px; text-align: center; }
+    .del-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: clamp(24px,4vw,32px); }
+    .del-card .form-group { margin-bottom: 18px; }
+  </style>
+</head>
+<body>
+  <div class="arena-lanes" aria-hidden="true"></div>
+  <article class="doc" style="max-width:560px">
+    <a href="index.html" class="back">← Voltar para a ferramenta</a>
+    <h1>Solicitar Exclusão de Dados</h1>
+    <p class="lead">Em conformidade com a LGPD, você pode solicitar a exclusão dos seus dados pessoais a qualquer momento.</p>
+
+    <div class="del-card">
+      <form id="deletion-form">
+        <div class="form-group">
+          <label for="del-email">Seu e-mail cadastrado</label>
+          <input type="email" id="del-email" placeholder="seu@email.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="del-phone">Seu WhatsApp (opcional)</label>
+          <input type="tel" id="del-phone" placeholder="11999999999" autocomplete="tel">
+        </div>
+        <div class="form-group">
+          <label for="del-reason">Motivo (opcional)</label>
+          <textarea id="del-reason" placeholder="Conte-nos por que deseja excluir seus dados..."></textarea>
+        </div>
+        <button type="submit" id="del-submit" class="btn-primary" style="width:100%">
+          <span class="btn-text">Enviar solicitação</span>
+          <span class="btn-loading">Enviando...</span>
+        </button>
+        <p id="del-error" class="error-message"></p>
+        <p id="del-success" class="success-message"></p>
+      </form>
+    </div>
+
+    <div class="step-card" style="margin-top:24px">
+      <p style="color:var(--text-muted);font-size:14px;margin:0"><strong style="color:var(--text)">O que acontece após a solicitação:</strong><br>
+      Sua solicitação será processada em até 15 dias úteis. Você receberá confirmação por e-mail quando seus dados forem excluídos. Dúvidas: contato@lyraarte.com</p>
+    </div>
+
+    <div class="doc-foot">
+      <p>Feito com carinho para a comunidade <strong>Maestros da IA</strong>. ·
+      <a href="privacy-policy.html">Política de Privacidade</a> ·
+      <a href="https://comunidade.maestrosdaia.com" target="_blank" rel="noopener noreferrer">Conheça a Comunidade</a></p>
+    </div>
+  </article>
+
+  <script src="config.js"></script>
+  <script>
+    document.getElementById('deletion-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var email = document.getElementById('del-email').value.trim();
+      var phone = document.getElementById('del-phone').value.trim();
+      var reason = document.getElementById('del-reason').value.trim();
+      var submitBtn = document.getElementById('del-submit');
+      var errorEl = document.getElementById('del-error');
+      var successEl = document.getElementById('del-success');
+
+      errorEl.style.display = 'none';
+      successEl.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.querySelector('.btn-text').style.display = 'none';
+      submitBtn.querySelector('.btn-loading').style.display = 'inline';
+
+      try {
+        var base = (window.APP_CONFIG && window.APP_CONFIG.n8nWebhookBase) || '';
+        var resp = await fetch(base + '/request-deletion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email.toLowerCase(),
+            phone: phone.replace(/\D/g, ''),
+            reason: reason || null
+          })
+        });
+        var result = {};
+        try { result = await resp.json(); } catch {}
+
+        if (!result.success) {
+          errorEl.textContent = result.error || 'Erro ao enviar. Tente novamente ou entre em contato por e-mail.';
+          errorEl.style.display = 'block';
+        } else {
+          successEl.textContent = 'Solicitação enviada com sucesso! Processaremos em até 15 dias úteis.';
+          successEl.style.display = 'block';
+          document.getElementById('deletion-form').reset();
+        }
+      } catch {
+        errorEl.textContent = 'Erro de conexão. Verifique sua internet e tente novamente.';
+        errorEl.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.querySelector('.btn-text').style.display = 'inline';
+        submitBtn.querySelector('.btn-loading').style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

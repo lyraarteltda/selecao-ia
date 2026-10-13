@@ -1,0 +1,13 @@
+{
+  "name": "selecao-ia",
+  "version": "1.0.0",
+  "description": "Triagem de currículos em lote com IA (BYOK): rubrica ponderada, ranking, modo cego e exportação .xlsx/.csv/PDF.",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve .",
+    "lint": "echo 'No linter configured — static HTML project'"
+  },
+  "keywords": ["maestria-da-ia", "community-tool", "byok"],
+  "author": "APP-BUILDER-01",
+  "license": "UNLICENSED"
+}

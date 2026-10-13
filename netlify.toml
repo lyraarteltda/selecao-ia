@@ -1,0 +1,49 @@
+[build]
+  publish = "/"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    X-XSS-Protection = "0"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://gate.maestrosdaia.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://n8n.srv1268751.hstgr.cloud https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com https://openrouter.ai https://*.fal.ai https://queue.fal.run; img-src 'self' data: https:; font-src 'self'; media-src 'self' blob:; frame-ancestors 'none'"
+
+# Multi-page static site — no SPA catch-all. Unknown paths return a real 404.
+# A 200 catch-all made /.env, /.git/*, /backup.zip etc. all answer 200 and
+# tripped every path-enumeration scanner (COR-023). Explicit denies below are
+# defense-in-depth so dotfiles/VCS metadata can never be served.
+[[redirects]]
+  from = "/.git/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/.env*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+# Repository docs are not site content — never serve them (deployment.md).
+[[redirects]]
+  from = "/README.md"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/DEPLOY.md"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/package.json"
+  to = "/404.html"
+  status = 404
+  force = true

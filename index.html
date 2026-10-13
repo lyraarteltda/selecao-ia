@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <script>/* gate-bootstrap: capture an early login submit before the remote gate wires up, so the first click is never lost */
+  (function(){function h(e){var f=e.target;if(f&&f.id==='gate-form'&&!window.MembershipGate){e.preventDefault();e.stopImmediatePropagation();window.__gateEarlySubmit=true;}}window.addEventListener('submit',h,true);window.__gateBootstrapDisarm=function(){window.removeEventListener('submit',h,true);};})();
+  /* returning-member revalidation state (COR-062): hide the login form flash if a session exists */
+  (function(){try{if(localStorage.getItem('maestria_member_session')){document.documentElement.className+=' is-gate-checking';var mo=new MutationObserver(function(){var g=document.getElementById('gate-screen');if(!g||!g.classList.contains('active')){document.documentElement.classList.remove('is-gate-checking');mo.disconnect();}});document.addEventListener('DOMContentLoaded',function(){var t=['gate-screen','key-screen','app-screen'];t.forEach(function(id){var el=document.getElementById(id);if(el)mo.observe(el,{attributes:true,attributeFilter:['class']});});setTimeout(function(){document.documentElement.classList.remove('is-gate-checking');mo.disconnect();},8000);});}}catch(e){}})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seleção IA — Maestros da IA</title>
+  <meta name="description" content="Triagem de currículos em lote com IA: monte a rubrica da vaga, solte os currículos em PDF e receba o ranking, o relatório de cada candidato e as perguntas de entrevista.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://gate.maestrosdaia.com">
+  <link rel="preload" href="https://gate.maestrosdaia.com/v1/membership-gate.js" as="script">
+  <link rel="preload" href="fonts/big-shoulders-display-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2310203a'/%3E%3Crect x='7' y='6' width='18' height='14' rx='2' fill='%23ffffff'/%3E%3Crect x='14.5' y='20' width='3' height='7' fill='%23c9a13b'/%3E%3Cpath d='M11 15.5l3-6h1.6l-3 6zM17 9.5h4.2v1.4h-2.6l-.2 1.3c1.9-.2 3 .6 3 1.9 0 1.4-1.1 2.3-2.8 2.3-.8 0-1.5-.2-2-.5l.4-1.2c.4.2.9.4 1.5.4.8 0 1.3-.4 1.3-1 0-.8-.9-1.2-2.9-1z' fill='%2310203a'/%3E%3C/svg%3E">
+</head>
+<body>
+  <div class="arena-lanes" aria-hidden="true"></div>
+
+  <!-- MEMBERSHIP GATE -->
+  <div id="gate-screen" class="screen active">
+    <div class="gate-container">
+      <div class="gate-paddles" aria-hidden="true">
+        <span class="paddle p1">9,2</span><span class="paddle p2">9,6</span><span class="paddle p3">8,8</span>
+      </div>
+      <div class="gate-header">
+        <p class="eyebrow">Mesa de jurados · triagem de candidatos</p>
+        <h1 class="display-title">Seleção IA</h1>
+        <p class="subtitle">Uma rubrica justa para a vaga, a mesma régua para cada currículo — e o ranking pronto para decidir quem entrevistar.</p>
+        <p class="community-badge">Exclusivo para membros da Comunidade Maestros da IA</p>
+      </div>
+
+      <form id="gate-form" class="gate-form" novalidate>
+        <div class="form-group">
+          <label for="gate-email">Seu e-mail cadastrado</label>
+          <input type="email" id="gate-email" placeholder="seu@email.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="gate-phone">Seu WhatsApp (com DDD)</label>
+          <input type="tel" id="gate-phone" placeholder="11999999999" autocomplete="tel">
+        </div>
+        <p class="form-hint">Basta um dos dois — e-mail <em>ou</em> WhatsApp da sua compra.</p>
+        <button type="submit" id="gate-submit" class="btn-primary">
+          <span class="btn-text">Verificar acesso</span>
+          <span class="btn-loading">Verificando...</span>
+        </button>
+        <p id="gate-error" class="error-message"></p>
+      </form>
+      <p class="gate-checking-note">Conferindo o seu acesso…</p>
+
+      <p class="gate-footer">Ainda não é membro? <a href="https://comunidade.maestrosdaia.com" target="_blank" rel="noopener noreferrer">Conheça a Comunidade Maestros da IA</a></p>
+    </div>
+  </div>
+
+  <!-- API KEY SETUP -->
+  <div id="key-screen" class="screen">
+    <div class="key-container">
+      <p class="eyebrow">Antes da competição</p>
+      <h2>Conecte sua chave de IA</h2>
+      <p class="subtitle">A ferramenta usa a <strong>sua própria chave</strong> (BYOK). Ela fica salva só no seu navegador — nunca é enviada para nossos servidores. Os currículos também são lidos aqui no seu navegador e vão direto para o provedor de IA da sua chave.</p>
+
+      <div id="key-inputs" class="key-inputs">
+        <!-- Populated by api-key-manager.js (OpenRouter) -->
+      </div>
+
+      <div class="key-field">
+        <label for="key-model-select">Modelo de IA</label>
+        <select id="key-model-select"></select>
+        <p class="key-note">Com uma chave da OpenRouter você escolhe entre Claude, GPT, Gemini, DeepSeek e os modelos em alta — tudo com a mesma chave. Para lotes grandes de currículos, um modelo rápido e econômico (como o Gemini Flash) costuma ser a melhor escolha.</p>
+      </div>
+
+      <div class="key-actions">
+        <button id="key-continue" class="btn-primary" disabled>Entrar na mesa de jurados</button>
+        <button id="key-skip" class="btn-secondary">Pular por enquanto</button>
+      </div>
+
+      <details class="key-info">
+        <summary>Como consigo uma chave da OpenRouter?</summary>
+        <div class="key-info-content">
+          <p>1. Crie uma conta em <code>openrouter.ai</code>.</p>
+          <p>2. Acesse <code>openrouter.ai/keys</code> e clique em <em>Create Key</em>.</p>
+          <p>3. Adicione créditos (a partir de US$5) e cole a chave <code>sk-or-...</code> aqui.</p>
+          <p>Uma única chave dá acesso a todos os modelos do seletor.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- MAIN APPLICATION -->
+  <div id="app-screen" class="screen">
+    <header class="app-header">
+      <div class="header-left">
+        <svg class="app-brandmark" viewBox="0 0 32 32" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" rx="6" fill="#10203a"/><rect x="7" y="6" width="18" height="14" rx="2" fill="#fff"/><rect x="14.5" y="20" width="3" height="7" fill="#c9a13b"/><path d="M11 15.5l3-6h1.6l-3 6z" fill="#10203a"/><path d="M17 9.5h4.2v1.4h-2.6l-.2 1.3c1.9-.2 3 .6 3 1.9 0 1.4-1.1 2.3-2.8 2.3-.8 0-1.5-.2-2-.5l.4-1.2c.4.2.9.4 1.5.4.8 0 1.3-.4 1.3-1 0-.8-.9-1.2-2.9-1z" fill="#10203a"/></svg>
+        <h1 class="app-title">Seleção IA</h1>
+        <span class="vaga-pill" id="vaga-pill" hidden></span>
+      </div>
+      <div class="header-right">
+        <a href="about.html" class="btn-icon" title="Sobre esta ferramenta" aria-label="Sobre">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </a>
+        <button id="manage-keys-btn" class="btn-icon" title="Gerenciar chaves de API" aria-label="Gerenciar chaves">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        </button>
+        <button id="logout-btn" class="btn-icon" title="Sair" aria-label="Sair">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Stage rail: the three "provas" of the selection -->
+    <nav class="stages" role="tablist" aria-label="Etapas da seleção">
+      <button class="stage on" role="tab" data-stage="vaga" aria-selected="true"><span class="stage-n">1</span><span class="stage-t">A vaga e a rubrica</span></button>
+      <button class="stage" role="tab" data-stage="candidatos" aria-selected="false"><span class="stage-n">2</span><span class="stage-t">Candidatos</span><span class="stage-count" id="count-cands">0</span></button>
+      <button class="stage" role="tab" data-stage="placar" aria-selected="false"><span class="stage-n">3</span><span class="stage-t">Placar</span><span class="stage-count" id="count-done">0</span></button>
+      <button class="stage stage-lib" role="tab" data-stage="vagas" aria-selected="false"><span class="stage-n">≡</span><span class="stage-t">Vagas salvas</span></button>
+    </nav>
+
+    <main class="app-main">
+
+      <!-- ── STAGE 1: VAGA + RUBRICA ── -->
+      <section class="pane on" id="pane-vaga" aria-label="A vaga e a rubrica">
+        <div class="split">
+          <div class="card brief">
+            <h2 class="card-h">Descreva a vaga</h2>
+            <p class="card-sub">Cole o anúncio da vaga ou escreva o que você procura. A IA transforma isso numa rubrica de avaliação com pesos — que você pode ajustar antes de avaliar qualquer currículo.</p>
+            <div class="field">
+              <label for="in-titulo">Cargo</label>
+              <input type="text" id="in-titulo" maxlength="120" placeholder="Ex.: Social Media Pleno">
+            </div>
+            <div class="field">
+              <label for="in-vaga">Descrição da vaga e requisitos</label>
+              <textarea id="in-vaga" maxlength="6000" rows="9" placeholder="Responsabilidades, requisitos obrigatórios, diferenciais, modelo de trabalho, senioridade…"></textarea>
+              <span class="mono-count" id="vaga-count">0 / 6000</span>
+            </div>
+            <div class="field">
+              <label for="in-empresa">Sobre a empresa <span class="hint">(opcional — entra no anúncio)</span></label>
+              <input type="text" id="in-empresa" maxlength="300" placeholder="Ex.: Agência de marketing digital em Curitiba, 12 pessoas">
+            </div>
+            <div class="model-row">
+              <label for="model-select">Modelo de IA</label>
+              <select id="model-select"></select>
+            </div>
+            <div class="row-actions">
+              <button id="rubric-btn" class="btn-primary">Montar rubrica</button>
+              <button id="example-btn" class="btn-ghost" type="button">Usar um exemplo pronto</button>
+            </div>
+            <div id="rubric-err" class="err-inline" role="alert" hidden></div>
+          </div>
+
+          <div class="card rubric">
+            <div class="card-h-row">
+              <h2 class="card-h">Rubrica de avaliação</h2>
+              <span class="weight-total" id="weight-total" hidden></span>
+            </div>
+            <div id="rubric-empty" class="empty-state">
+              <div class="empty-paddles" aria-hidden="true"><span>?</span><span>?</span><span>?</span></div>
+              <h3>Nenhuma rubrica ainda</h3>
+              <p>A rubrica é a régua da mesa de jurados: cada critério recebe um peso, e todo candidato é medido pelos mesmos critérios. Monte com a IA ou adicione critérios à mão.</p>
+              <button class="btn-secondary" id="rubric-manual" type="button">Criar critérios à mão</button>
+            </div>
+            <div id="rubric-loading" class="loading-state" hidden>
+              <div class="flip-loader" aria-hidden="true"><span></span><span></span><span></span></div>
+              <p>Os jurados estão definindo os critérios…</p>
+            </div>
+            <div id="rubric-editor" hidden>
+              <p class="card-sub">Ajuste nomes, tipo e peso. <strong>Obrigatório</strong> = eliminatório: quem tirar nota 0 ou 1 nele vai para o fim do placar.</p>
+              <div class="rubric-head" aria-hidden="true"><span>Critério</span><span>Tipo</span><span>Peso</span><span></span></div>
+              <ol class="rubric-list" id="rubric-list"></ol>
+              <div class="row-actions">
+                <button class="btn-ghost" id="add-criterion" type="button">+ Adicionar critério</button>
+                <button class="btn-primary" id="to-cands" type="button">Rubrica pronta → enviar currículos</button>
+              </div>
+              <details class="anuncio" id="anuncio-box" hidden>
+                <summary>Anúncio da vaga pronto para publicar</summary>
+                <pre class="anuncio-text" id="anuncio-text"></pre>
+                <div class="row-actions">
+                  <button class="btn-secondary" id="copy-anuncio" type="button">Copiar anúncio</button>
+                  <button class="btn-ghost" id="dl-anuncio" type="button">Baixar .txt</button>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── STAGE 2: CANDIDATOS ── -->
+      <section class="pane" id="pane-candidatos" aria-label="Candidatos">
+        <div id="cands-locked" class="card empty-state wide">
+          <h3>Monte a rubrica primeiro</h3>
+          <p>Os currículos são avaliados pelos critérios da etapa 1. Defina a vaga e a rubrica para liberar esta etapa.</p>
+          <button class="btn-secondary" type="button" data-goto="vaga">Ir para a vaga</button>
+        </div>
+        <div id="cands-open" class="split" hidden>
+          <div class="card intake">
+            <h2 class="card-h">Envie os currículos</h2>
+            <p class="card-sub">PDF ou TXT, até 50 de uma vez. Os arquivos são lidos <strong>aqui no seu navegador</strong> — nada passa pelos nossos servidores.</p>
+            <label class="dropzone" id="dropzone" for="file-input">
+              <input type="file" id="file-input" accept=".pdf,.txt,.md,application/pdf,text/plain" multiple>
+              <span class="dz-icon" aria-hidden="true">
+                <svg viewBox="0 0 48 48" width="44" height="44" fill="none"><rect x="10" y="6" width="24" height="32" rx="3" stroke="currentColor" stroke-width="2.5"/><path d="M16 15h12M16 21h12M16 27h7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="35" cy="35" r="8" fill="#c9a13b"/><path d="M35 31v8M31 35h8" stroke="#10203a" stroke-width="2.5" stroke-linecap="round"/></svg>
+              </span>
+              <span class="dz-title">Arraste os PDFs aqui</span>
+              <span class="dz-sub">ou toque para escolher arquivos</span>
+            </label>
+            <details class="paste-box">
+              <summary>Ou cole o texto de um currículo</summary>
+              <div class="field">
+                <label for="paste-name">Identificação (opcional)</label>
+                <input type="text" id="paste-name" maxlength="80" placeholder="Ex.: Currículo recebido por e-mail">
+              </div>
+              <div class="field">
+                <label for="paste-text">Texto do currículo</label>
+                <textarea id="paste-text" rows="7" maxlength="20000" placeholder="Cole aqui o conteúdo do currículo…"></textarea>
+              </div>
+              <button class="btn-secondary" id="paste-add" type="button">Adicionar à lista</button>
+            </details>
+            <p class="fine">Arquivos .docx: salve como PDF antes de enviar. PDFs escaneados (imagem) não têm texto — nesses casos, cole o texto manualmente.</p>
+          </div>
+
+          <div class="card lanes-card">
+            <div class="card-h-row">
+              <h2 class="card-h">Raias</h2>
+              <button class="btn-link" id="clear-cands" type="button">Limpar lista</button>
+            </div>
+            <div id="cands-empty" class="empty-state small">
+              <p>Nenhum currículo na lista ainda.</p>
+            </div>
+            <ol class="lane-list" id="cand-list"></ol>
+            <div class="eval-bar">
+              <div class="progress" id="eval-progress" hidden><div class="progress-fill" id="eval-fill"></div><span class="progress-label" id="eval-label"></span></div>
+              <div class="row-actions">
+                <button class="btn-primary" id="eval-btn" type="button" disabled>Avaliar currículos</button>
+                <button class="btn-ghost" id="stop-btn" type="button" hidden>Parar</button>
+              </div>
+              <p class="fine" id="eval-note">Cada currículo é avaliado numa chamada separada, com a mesma rubrica — sem um influenciar o outro.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── STAGE 3: PLACAR ── -->
+      <section class="pane" id="pane-placar" aria-label="Placar">
+        <div id="board-empty" class="card empty-state wide">
+          <div class="empty-podium" aria-hidden="true"><span class="s2"></span><span class="s1"></span><span class="s3"></span></div>
+          <h3>O placar aparece aqui</h3>
+          <p>Depois de avaliar os currículos, você vê o pódio, o ranking completo, a nota de cada critério com a evidência tirada do currículo e as perguntas de entrevista sob medida.</p>
+          <button class="btn-secondary" type="button" data-goto="candidatos">Ir para os candidatos</button>
+        </div>
+
+        <div id="board" hidden>
+          <div class="board-toolbar card">
+            <div class="toolbar-left">
+              <label class="switch">
+                <input type="checkbox" id="blind-toggle">
+                <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+                <span class="switch-label">Modo cego <span class="hint">— oculta nome e contato para reduzir viés</span></span>
+              </label>
+            </div>
+            <div class="toolbar-right">
+              <button class="btn-secondary" id="dl-xlsx" type="button">Planilha .xlsx</button>
+              <button class="btn-ghost" id="dl-csv" type="button">.csv</button>
+              <button class="btn-ghost" id="print-report" type="button">Relatório (PDF)</button>
+            </div>
+          </div>
+
+          <div class="podium" id="podium"></div>
+
+          <div class="board-grid">
+            <div class="card ranking">
+              <h2 class="card-h">Ranking completo</h2>
+              <ol class="rank-list" id="rank-list"></ol>
+              <p class="fine legend"><span class="tag tag-go">Entrevistar</span> nota ≥ 75 · <span class="tag tag-maybe">Talvez</span> 55–74 · <span class="tag tag-no">Não avançar</span> &lt; 55 · <span class="tag tag-out">Eliminado</span> requisito obrigatório não atendido</p>
+            </div>
+            <div class="card scorecard" id="scorecard">
+              <div class="empty-state small"><p>Toque num candidato para ver a ficha de avaliação.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── VAGAS SALVAS ── -->
+      <section class="pane" id="pane-vagas" aria-label="Vagas salvas">
+        <div class="card">
+          <div class="card-h-row">
+            <h2 class="card-h">Vagas salvas neste navegador</h2>
+            <button class="btn-secondary" id="new-vaga" type="button">+ Nova vaga</button>
+          </div>
+          <p class="card-sub">Cada vaga guarda a rubrica, os currículos e as avaliações — só aqui no seu navegador. Apague quando o processo terminar.</p>
+          <div id="vagas-empty" class="empty-state small"><p>Nenhuma vaga salva ainda.</p></div>
+          <ul class="vaga-list" id="vaga-list"></ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- Printable report (filled on demand, visible only in print) -->
+    <div id="report" class="report" aria-hidden="true"></div>
+
+    <footer class="app-footer">
+      <p>Feito com carinho para a comunidade <strong>Maestros da IA</strong></p>
+      <p class="footer-links">
+        <a href="privacy-policy.html" target="_blank" rel="noopener noreferrer">Política de Privacidade</a>
+        <span class="footer-sep">·</span>
+        <a href="data-deletion.html" target="_blank" rel="noopener noreferrer">Solicitar Exclusão de Dados</a>
+      </p>
+    </footer>
+  </div>
+
+  <!-- API Key Manager Modal (toggled via style.display by api-key-manager.js; NOT the hidden attr — COR-052) -->
+  <div id="key-modal" class="modal" style="display:none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Gerenciar Chaves de API</h3>
+        <button id="modal-close" class="btn-icon" aria-label="Fechar">&times;</button>
+      </div>
+      <div id="modal-key-inputs" class="key-inputs"></div>
+      <div class="key-field">
+        <label for="model-select-modal">Modelo de IA</label>
+        <select id="model-select-modal"></select>
+      </div>
+      <div class="modal-actions">
+        <button id="modal-save" class="btn-primary">Salvar</button>
+        <button id="modal-clear" class="btn-danger">Limpar todas as chaves</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="config.js"></script>
+  <script src="kill-switch.js"></script>
+  <script src="rate-limiter.js"></script>
+  <script src="https://gate.maestrosdaia.com/v1/membership-gate.js"></script>
+  <script src="api-key-manager.js"></script>
+  <script src="feedback-widget.js"></script>
+  <script src="vendor/xlsx.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

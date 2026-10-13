@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Política de Privacidade — Seleção IA</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2310203a'/%3E%3Crect x='7' y='6' width='18' height='14' rx='2' fill='%23ffffff'/%3E%3Crect x='14.5' y='20' width='3' height='7' fill='%23c9a13b'/%3E%3Cpath d='M11 15.5l3-6h1.6l-3 6zM17 9.5h4.2v1.4h-2.6l-.2 1.3c1.9-.2 3 .6 3 1.9 0 1.4-1.1 2.3-2.8 2.3-.8 0-1.5-.2-2-.5l.4-1.2c.4.2.9.4 1.5.4.8 0 1.3-.4 1.3-1 0-.8-.9-1.2-2.9-1z' fill='%2310203a'/%3E%3C/svg%3E">
+</head>
+<body>
+  <div class="arena-lanes" aria-hidden="true"></div>
+  <article class="doc">
+    <a href="index.html" class="back">← Voltar para a ferramenta</a>
+    <h1>Política de Privacidade</h1>
+    <p style="color:var(--text-dim);font-size:13px">Última atualização: 12/10/2026</p>
+
+    <p class="lead">Esta Política de Privacidade descreve como a ferramenta <strong>Seleção IA</strong>, oferecida pela comunidade <strong>Maestros da IA</strong>, coleta, utiliza e protege os dados pessoais dos seus usuários, em conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018).</p>
+
+    <h2>1. Dados Coletados</h2>
+    <p>Coletamos apenas os dados estritamente necessários para o funcionamento da ferramenta:</p>
+    <ul>
+      <li><strong>E-mail:</strong> para verificação de acesso à comunidade.</li>
+      <li><strong>Telefone (WhatsApp):</strong> para verificação de acesso à comunidade.</li>
+    </ul>
+    <p>Sua chave de API da OpenRouter é armazenada <strong>apenas no seu navegador</strong> (localStorage) e nunca é transmitida para nossos servidores — ela vai direto da sua máquina para a OpenRouter. As vagas, rubricas, currículos e avaliações também ficam <strong>apenas no seu navegador</strong>: os arquivos são lidos localmente e o texto de cada currículo é enviado somente ao provedor de IA da <em>sua</em> chave, no momento da avaliação. Nós não recebemos nem armazenamos currículos.</p>
+    <h2>1.1 Dados de candidatos</h2>
+    <p>Ao usar a ferramenta para triar currículos, <strong>você</strong> é o controlador dos dados pessoais dos candidatos (LGPD, art. 5º, VI) e deve tratá-los apenas para o processo seletivo, informar os candidatos e apagá-los quando o processo terminar (use “Apagar” em <em>Vagas salvas</em>). A ferramenta oferece o modo cego e instrui a IA a não considerar características protegidas, mas a decisão de contratação é sempre humana e de sua responsabilidade.</p>
+
+    <h2>2. Finalidade do Tratamento</h2>
+    <ul>
+      <li><strong>Verificação de acesso:</strong> confirmar que o usuário é membro ativo da comunidade.</li>
+      <li><strong>Suporte e melhoria:</strong> responder a feedback enviado voluntariamente pela ferramenta.</li>
+    </ul>
+
+    <h2>3. Base Legal</h2>
+    <p>O tratamento de dados é realizado com base no <strong>legítimo interesse</strong> (Art. 7º, IX da LGPD) para verificação de acesso e na <strong>execução de contrato</strong> (Art. 7º, V) referente à assinatura da comunidade Maestros da IA.</p>
+
+    <h2>4. Compartilhamento de Dados</h2>
+    <p>Seus dados <strong>não são vendidos ou compartilhados</strong> com terceiros para fins comerciais. Utilizamos os seguintes serviços técnicos (operadores):</p>
+    <ul>
+      <li><strong>Supabase:</strong> banco de dados para verificação de membros, acessado exclusivamente pelo nosso servidor (o navegador nunca acessa o banco).</li>
+      <li><strong>n8n:</strong> intermediação segura entre a ferramenta e o banco de dados.</li>
+      <li><strong>Netlify:</strong> hospedagem da aplicação web.</li>
+      <li><strong>OpenRouter:</strong> provedor de IA acionado diretamente pelo seu navegador com a <em>sua</em> chave — nós não intermediamos essa chamada.</li>
+    </ul>
+
+    <h2>5. Período de Retenção</h2>
+    <ul>
+      <li><strong>Dados de verificação:</strong> mantidos enquanto o usuário for membro ativo da comunidade.</li>
+      <li><strong>Dados no navegador (chave, vagas, currículos e avaliações):</strong> permanecem até você limpá-los pela ferramenta ou pelo navegador.</li>
+    </ul>
+
+    <h2>6. Seus Direitos (LGPD)</h2>
+    <p>Você tem direito a:</p>
+    <ul>
+      <li>Confirmação da existência de tratamento de dados;</li>
+      <li>Acesso aos seus dados pessoais;</li>
+      <li>Correção de dados incompletos ou desatualizados;</li>
+      <li>Eliminação dos dados pessoais (veja o link abaixo);</li>
+      <li>Informação sobre compartilhamento de dados;</li>
+      <li>Revogação do consentimento.</li>
+    </ul>
+
+    <div class="step-card">
+      <p style="margin:0"><strong style="color:var(--text)">Solicitar exclusão dos seus dados:</strong><br>
+      <a href="data-deletion.html">Clique aqui para solicitar a exclusão dos seus dados pessoais</a></p>
+    </div>
+
+    <h2>7. Segurança</h2>
+    <ul>
+      <li>Comunicação criptografada (HTTPS/TLS);</li>
+      <li>Row-Level Security (RLS) no banco de dados;</li>
+      <li>Limitação de taxa de requisições;</li>
+      <li>Sua chave de API nunca é armazenada no servidor.</li>
+    </ul>
+
+    <h2>8. Contato</h2>
+    <ul>
+      <li><strong>E-mail:</strong> contato@lyraarte.com</li>
+      <li><strong>WhatsApp:</strong> +55 11 99735-2416</li>
+    </ul>
+
+    <div class="doc-foot">
+      <p>Feito com carinho para a comunidade <strong>Maestros da IA</strong>. ·
+      <a href="data-deletion.html">Exclusão de Dados</a> ·
+      <a href="https://comunidade.maestrosdaia.com" target="_blank" rel="noopener noreferrer">Conheça a Comunidade</a></p>
+    </div>
+  </article>
+</body>
+</html>

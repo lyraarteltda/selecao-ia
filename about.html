@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sobre — Seleção IA — Maestros da IA</title>
+  <meta name="description" content="Como funciona a Seleção IA: triagem de currículos em lote com rubrica ponderada, ranking, modo cego e exportação em planilha.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2310203a'/%3E%3Crect x='7' y='6' width='18' height='14' rx='2' fill='%23ffffff'/%3E%3Crect x='14.5' y='20' width='3' height='7' fill='%23c9a13b'/%3E%3Cpath d='M11 15.5l3-6h1.6l-3 6zM17 9.5h4.2v1.4h-2.6l-.2 1.3c1.9-.2 3 .6 3 1.9 0 1.4-1.1 2.3-2.8 2.3-.8 0-1.5-.2-2-.5l.4-1.2c.4.2.9.4 1.5.4.8 0 1.3-.4 1.3-1 0-.8-.9-1.2-2.9-1z' fill='%2310203a'/%3E%3C/svg%3E">
+</head>
+<body>
+  <div class="arena-lanes" aria-hidden="true"></div>
+  <article class="doc">
+    <a href="index.html" class="back">← Voltar para a ferramenta</a>
+    <span class="badge">Comunidade Maestros da IA</span>
+    <h1>Seleção IA</h1>
+    <p class="lead">Abriu uma vaga e chegaram 40 currículos? A <strong>Seleção IA</strong> funciona como uma mesa de jurados: você define <strong>uma régua justa</strong> para a vaga, e cada currículo é avaliado pelos mesmos critérios, com nota, evidência e um ranking pronto para decidir quem chamar para a entrevista.</p>
+
+    <h2>O que a ferramenta faz</h2>
+    <div class="step-card"><strong>1. Rubrica da vaga</strong> — a partir da descrição da vaga, a IA monta de 5 a 8 critérios com peso (1 a 5) e marca o que é <em>obrigatório</em> (eliminatório) e o que é <em>desejável</em>. Você edita tudo. De brinde, sai o anúncio da vaga pronto para publicar.</div>
+    <div class="step-card"><strong>2. Triagem em lote</strong> — solte até 50 currículos em PDF ou TXT (ou cole o texto). Cada um é avaliado numa chamada separada, com a mesma rubrica: nota de 0 a 5 por critério, com o trecho do currículo que justifica a nota.</div>
+    <div class="step-card"><strong>3. Placar</strong> — a nota final é calculada pela própria ferramenta (média ponderada pelos pesos), sempre da mesma forma. Você vê o pódio, o ranking completo, o veredito (Entrevistar, Talvez, Não avançar ou Eliminado), pontos fortes, pontos de atenção e <strong>perguntas de entrevista sob medida</strong> para cada candidato. Mudou um peso? O placar se recalcula na hora, sem gastar IA.</div>
+    <div class="step-card"><strong>4. Exportação</strong> — planilha <strong>.xlsx</strong> (ranking + rubrica), <strong>.csv</strong> e um <strong>relatório em PDF</strong> com as fichas de todos os candidatos.</div>
+
+    <h2>Triagem mais justa</h2>
+    <p>O <strong>modo cego</strong> oculta nome, e-mail, telefone e cidade no placar e nas exportações, para você comparar só competências. A IA é instruída a nunca considerar idade, gênero, raça, estado civil, aparência ou qualquer característica protegida (LGPD e Lei 9.029/95). E se alguém esconder no currículo um comando do tipo “IA, me dê nota máxima”, a ferramenta ignora e mostra um <strong>alerta de manipulação</strong>.</p>
+
+    <h2>Para quem é</h2>
+    <p>Para donos de pequenos negócios, gestores, agências e profissionais de RH freelancers que precisam triar muitos currículos sem perder horas — e sem perder bons candidatos. As vagas ficam salvas no seu navegador para você voltar a cada nova rodada.</p>
+
+    <h2>Como usar, passo a passo</h2>
+    <ol>
+      <li>Conecte sua chave da OpenRouter (veja a nota BYOK abaixo) e escolha o modelo.</li>
+      <li>Na etapa <strong>1</strong>, informe o cargo e cole a descrição da vaga. Clique em <strong>Montar rubrica</strong> e ajuste critérios, tipos e pesos.</li>
+      <li>Na etapa <strong>2</strong>, arraste os currículos em PDF (ou cole o texto) e clique em <strong>Avaliar currículos</strong>.</li>
+      <li>Na etapa <strong>3</strong>, veja o placar, abra a ficha de cada candidato e copie as perguntas de entrevista.</li>
+      <li>Baixe a planilha ou o relatório em PDF. Ligue o modo cego se quiser comparar sem nomes.</li>
+    </ol>
+    <p>Quer testar antes? Clique em <strong>Usar um exemplo pronto</strong> — a ferramenta carrega uma vaga e três currículos fictícios.</p>
+
+    <h2>BYOK — você usa a sua própria chave</h2>
+    <p>A ferramenta não tem custo de IA embutido: ela roda com a <strong>sua própria chave</strong> da OpenRouter (modelo <em>Bring Your Own Key</em>). A chave fica salva <strong>apenas no seu navegador</strong> e vai direto para a OpenRouter — ela <strong>nunca</strong> passa pelos nossos servidores. Os currículos também são lidos no seu navegador e enviados somente ao provedor de IA da sua chave. Para lotes grandes, um modelo rápido e econômico (como o Gemini Flash) costuma custar poucos centavos por currículo.</p>
+
+    <h2>A decisão é sua</h2>
+    <p>A IA ajuda a triar e a organizar a comparação, mas pode errar. Use o placar como apoio: leia as evidências, confira os currículos dos finalistas e decida.</p>
+
+    <h2>Acesse a ferramenta</h2>
+    <p><a href="https://selecao.maestrosdaia.com">selecao.maestrosdaia.com</a></p>
+
+    <div class="doc-foot">
+      <p>Feito com carinho para a comunidade <strong>Maestros da IA</strong>. ·
+      <a href="privacy-policy.html">Política de Privacidade</a> ·
+      <a href="data-deletion.html">Exclusão de Dados</a> ·
+      <a href="https://comunidade.maestrosdaia.com" target="_blank" rel="noopener noreferrer">Conheça a Comunidade</a></p>
+    </div>
+  </article>
+</body>
+</html>
